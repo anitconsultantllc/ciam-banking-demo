@@ -1,0 +1,1068 @@
+<title>CIAM Banking Demo Blueprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+:root{
+  --bg:#F3F6F7; --surface:#FFFFFF; --sunk:#E9EEF0; --ink:#15212B; --muted:#56646F; --line:#D3DBE0; --line-strong:#9FAEB8;
+  --accent:#0D6A72; --accent-soft:#DCEFF0;
+  --id:#6A4BB0; --id-soft:#EEE8FA; --kf:#9A6200; --kf-soft:#FBF1DE; --mq:#B3432A; --mq-soft:#FBE7E1;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --cond:"IBM Plex Sans Condensed","IBM Plex Sans","Arial Narrow",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0E1418; --surface:#151D23; --sunk:#1B252C; --ink:#E2E9EE; --muted:#95A3AE; --line:#29343C; --line-strong:#4A5A66;
+    --accent:#4FB5BB; --accent-soft:#16333A;
+    --id:#A98CEB; --id-soft:#261E3A; --kf:#E2A73C; --kf-soft:#33280F; --mq:#E77F61; --mq-soft:#3A1F18;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1418; --surface:#151D23; --sunk:#1B252C; --ink:#E2E9EE; --muted:#95A3AE; --line:#29343C; --line-strong:#4A5A66;
+  --accent:#4FB5BB; --accent-soft:#16333A;
+  --id:#A98CEB; --id-soft:#261E3A; --kf:#E2A73C; --kf-soft:#33280F; --mq:#E77F61; --mq-soft:#3A1F18;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15.5px/1.6 var(--sans);padding-inline:16px;padding-block:0 64px}
+.shell{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:200px minmax(0,1fr);gap:48px}
+@media (max-width:980px){.shell{grid-template-columns:minmax(0,1fr)} nav.toc{display:none}}
+nav.toc{position:sticky;top:env(safe-area-inset-top,0px);align-self:start;padding-top:40px;font-size:13.5px}
+nav.toc p{font:600 11px/1 var(--cond);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
+nav.toc ol{list-style:none;margin:0;padding:0;display:grid;gap:2px;counter-reset:s}
+nav.toc a{display:block;padding:5px 10px;border-radius:6px;color:var(--muted);text-decoration:none;border-left:2px solid transparent}
+nav.toc a:hover,nav.toc a:focus-visible{color:var(--ink);background:var(--sunk);outline:none}
+main{min-width:0}
+header.top{padding-block:44px 28px;border-bottom:1px solid var(--line)}
+.eyebrow{font:600 12px/1 var(--cond);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 14px}
+h1{font:700 clamp(30px,4.4vw,44px)/1.08 var(--cond);margin:0 0 14px;text-wrap:balance;letter-spacing:-.01em}
+h2{font:700 27px/1.15 var(--cond);margin:0 0 6px;text-wrap:balance}
+h3{font:600 19px/1.25 var(--cond);margin:34px 0 8px;text-wrap:balance}
+h4{font:600 15px/1.3 var(--sans);margin:0 0 6px}
+p{margin:0 0 14px;max-width:72ch}
+.lede{font-size:17px;color:var(--muted);max-width:68ch}
+section{padding-block:48px 8px;border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:0}
+.sub{color:var(--muted);margin-bottom:22px}
+a{color:var(--accent)}
+code,kbd{font:500 .88em var(--mono);background:var(--sunk);padding:1px 5px;border-radius:4px}
+ul.plain{margin:0 0 14px;padding-left:20px;max-width:72ch}
+ul.plain li{margin-bottom:6px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:720px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px}
+.panel h4{font:600 12px/1 var(--cond);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.panel ul{margin:0;padding-left:18px}
+.panel li{margin-bottom:7px}
+.pill{display:inline-block;font:600 11px/1 var(--cond);letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border-radius:99px;vertical-align:1px}
+.pill.ok{background:var(--accent-soft);color:var(--accent)}
+.pill.q{background:var(--kf-soft);color:var(--kf)}
+figure{margin:22px 0 18px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px}
+figure .scroll{overflow-x:auto}
+figcaption{font-size:13.5px;color:var(--muted);margin-top:12px;max-width:80ch}
+svg.dia{display:block;width:100%;height:auto;min-width:760px}
+.bx{fill:var(--surface);stroke:var(--line-strong);stroke-width:1.2}
+.bx-id{fill:var(--id-soft);stroke:var(--id);stroke-width:1.4}
+.bx-kf{fill:var(--kf-soft);stroke:var(--kf);stroke-width:1.4}
+.bx-mq{fill:var(--mq-soft);stroke:var(--mq);stroke-width:1.4}
+.bx-core{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.6}
+.bx-dash{fill:none;stroke:var(--line-strong);stroke-width:1.2;stroke-dasharray:5 4}
+.db{fill:var(--sunk);stroke:var(--line-strong);stroke-width:1}
+.t1{font:600 12.5px var(--sans);fill:var(--ink)}
+.t2{font:400 11px var(--mono);fill:var(--muted)}
+.t3{font:400 10.5px var(--mono);fill:var(--ink)}
+.cap{font:600 10.5px var(--cond);letter-spacing:.12em;text-transform:uppercase;fill:var(--muted)}
+.lbl{font:500 11px var(--sans);fill:var(--muted)}
+.lbl-id{font:500 11px var(--sans);fill:var(--id)}
+.lbl-kf{font:500 11px var(--sans);fill:var(--kf)}
+.lbl-mq{font:500 11px var(--sans);fill:var(--mq)}
+.ln{stroke:var(--ink);stroke-width:1.4;fill:none}
+.ln-soft{stroke:var(--line-strong);stroke-width:1.2;fill:none}
+.ln-id{stroke:var(--id);stroke-width:1.5;fill:none}
+.ln-kf{stroke:var(--kf);stroke-width:1.8;fill:none}
+.ln-mq{stroke:var(--mq);stroke-width:1.8;fill:none}
+.dash{stroke-dasharray:5 4}
+.mk-ink{fill:var(--ink)} .mk-id{fill:var(--id)} .mk-kf{fill:var(--kf)} .mk-mq{fill:var(--mq)} .mk-soft{fill:var(--line-strong)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:13px;color:var(--muted);margin-top:12px}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.legend i{display:inline-block;width:26px;height:0;border-top:2px solid}
+.tw{overflow-x:auto;margin:16px 0 20px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;vertical-align:top;padding:10px 14px;border-bottom:1px solid var(--line)}
+th{font:600 11.5px/1.2 var(--cond);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--sunk)}
+tr:last-child td{border-bottom:0}
+td code{white-space:nowrap}
+td:first-child{font-weight:500}
+pre.tree{font:13px/1.55 var(--mono);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow-x:auto;margin:14px 0 20px;color:var(--ink)}
+pre.tree .c{color:var(--muted)}
+pre.tree .h{color:var(--accent);font-weight:500}
+pre.mermaid{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;overflow-x:auto;margin:18px 0 8px;font:13px var(--mono)}
+.callout{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:16px 18px;margin:18px 0;max-width:80ch}
+.callout strong{color:var(--accent)}
+ol.steps{margin:0 0 14px;padding-left:22px;max-width:74ch}
+ol.steps li{margin-bottom:8px}
+.answer-yes{font:700 22px/1.2 var(--cond);color:var(--accent);margin:4px 0 10px}
+/* cheat sheet */
+.cs-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:18px 0 20px}
+.chip{font:500 13px/1 var(--sans);padding:8px 12px;border-radius:99px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip:focus-visible,.toggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.toggle{margin-left:auto;font:500 13px/1 var(--sans);padding:8px 12px;border-radius:8px;border:1px solid var(--accent);background:transparent;color:var(--accent);cursor:pointer}
+.cards{display:grid;gap:12px}
+.qa{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.qa .tag{font:600 10.5px/1 var(--cond);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.qa h4{font:600 16px/1.35 var(--sans);margin:6px 0 8px}
+.qa .a p{margin-bottom:8px}
+.qa .demo{font-size:13px;color:var(--muted);border-top:1px dashed var(--line);padding-top:8px;margin-top:8px}
+.qa .demo b{font-weight:600;color:var(--accent)}
+.qa .reveal{display:none;font:500 13px var(--sans);background:none;border:0;color:var(--accent);padding:0;cursor:pointer;text-decoration:underline}
+.quiz .qa .a{display:none}
+.quiz .qa .reveal{display:inline}
+.quiz .qa.open .a{display:block}
+.quiz .qa.open .reveal{display:none}
+.fill{background:var(--kf-soft);color:var(--ink);padding:0 4px;border-radius:3px;font-family:var(--mono);font-size:.9em}
+.phase{display:grid;grid-template-columns:48px minmax(0,1fr);gap:14px;padding:16px 0;border-bottom:1px solid var(--line)}
+.phase:last-child{border-bottom:0}
+.phase .n{font:700 26px/1 var(--cond);color:var(--accent)}
+.phase p{margin-bottom:6px}
+.phase .chk{font-size:13.5px;color:var(--muted)}
+/* diagram zoom */
+.zw{margin:18px 0 8px}
+.zbar{display:flex;gap:6px;align-items:center;justify-content:flex-end;margin-bottom:6px}
+.zbar button{font:500 13px/1 var(--sans);min-width:34px;padding:7px 10px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.zbar button:hover{border-color:var(--accent)}
+.zbar button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.zbar .zl{font:500 12px var(--mono);color:var(--muted);min-width:46px;text-align:center}
+.zview{overflow:auto;max-height:78vh;border-radius:10px;cursor:grab}
+.zview.drag{cursor:grabbing;user-select:none}
+.zview .scroll{overflow:visible}
+.zview pre.mermaid{margin:0}
+.zw.full{position:fixed;inset:0;z-index:50;background:var(--bg);padding:calc(12px + env(safe-area-inset-top,0px)) 16px 16px;margin:0;display:flex;flex-direction:column}
+.zw.full .zview{flex:1;max-height:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="shell">
+<nav class="toc" aria-label="Sections">
+  <p>Blueprint</p>
+  <ol>
+    <li><a href="#decisions">Decisions</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#flows">How it works together</a></li>
+    <li><a href="#standalone">How each piece runs alone</a></li>
+    <li><a href="#clean">Clean architecture</a></li>
+    <li><a href="#layout">Project layout</a></li>
+    <li><a href="#build">Build, run, deploy</a></li>
+    <li><a href="#java">.NET → Java guide</a></li>
+    <li><a href="#cheatsheet">Interview cheat sheet</a></li>
+    <li><a href="#plan">Build plan</a></li>
+  </ol>
+</nav>
+
+<main>
+<header class="top">
+  <p class="eyebrow">Design review · nothing built yet</p>
+  <h1>CIAM Banking Demo Blueprint</h1>
+  <p class="lede">A small online-banking platform built to show CIAM, microservices, Java, Angular, React and C# working together. Review the architecture, layout and build plan here before any code is written. The cheat sheet at the end maps each part to the questions it prepares you for.</p>
+</header>
+
+<!-- ============ DECISIONS ============ -->
+<section id="decisions">
+  <h2>Decisions</h2>
+  <p class="sub">What you've already confirmed, and what still needs an answer before scaffolding.</p>
+  <div class="grid2">
+    <div class="panel">
+      <h4>Confirmed</h4>
+      <ul>
+        <li>Full scope: 3 Java services, gateway, C# notification service, React and Angular portals.</li>
+        <li><b>Kafka</b> is the event backbone between all services.</li>
+        <li>The C# Notification Service puts each outgoing message on <b>RabbitMQ</b> for durable delivery before sending it.</li>
+        <li>Repository on GitHub with CI.</li>
+        <li>Clean architecture in every backend service (see <a href="#clean">section 5</a>).</li>
+        <li>No hard-coded config. Transfer limits, the step-up MFA threshold and email templates live in database tables. URLs and ports come from environment variables.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h4>Open questions</h4>
+      <ul>
+        <li><span class="pill q">Versions</span> I originally said Java 21 + Spring Boot 3. The current LTS pairing is <b>Java 25 + Spring Boot 4</b>. I'd use it if every library we need supports it when I scaffold, and fall back to 21 + 3.5 otherwise. OK?</li>
+        <li><span class="pill q">Repo</span> Name <code>ciam-banking-demo</code>, public so interviewers can browse it?</li>
+        <li><span class="pill q">Folder</span> <code>~/Documents/ciam-banking-demo</code>?</li>
+        <li><span class="pill q">Tokens</span> The SPAs hold tokens in memory (PKCE). The alternative is a BFF (backend-for-frontend), which is more "bank-grade" but adds a component. I recommend PKCE, with the BFF prepared as a talking point.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ARCHITECTURE ============ -->
+<section id="architecture">
+  <h2>Architecture</h2>
+  <p class="sub">Every box is its own container. Colour marks how each pair of components talks.</p>
+
+  <figure>
+    <div class="scroll">
+    <svg class="dia" viewBox="0 0 1180 600" role="img" aria-label="System architecture: browser apps sign in through Keycloak and call the API gateway, which routes to three Java services. Each service owns a Postgres database and publishes and consumes events on Kafka. The .NET notification service consumes Kafka events, queues emails on RabbitMQ, and a sender delivers them over SMTP to Mailpit.">
+      <defs>
+        <marker id="a-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-ink"/></marker>
+        <marker id="a-id" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-id"/></marker>
+        <marker id="a-kf" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-kf"/></marker>
+        <marker id="a-mq" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-mq"/></marker>
+        <marker id="a-soft" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-soft"/></marker>
+      </defs>
+
+      <!-- Browser group -->
+      <rect x="20" y="110" width="200" height="290" rx="10" class="bx-dash"/>
+      <text x="36" y="132" class="cap">Browser</text>
+      <rect x="40" y="145" width="160" height="56" rx="6" class="bx"/>
+      <text x="120" y="169" text-anchor="middle" class="t1">React portal</text>
+      <text x="120" y="187" text-anchor="middle" class="t2">customers · :5173</text>
+      <rect x="40" y="290" width="160" height="56" rx="6" class="bx"/>
+      <text x="120" y="314" text-anchor="middle" class="t1">Angular back-office</text>
+      <text x="120" y="332" text-anchor="middle" class="t2">staff · :4200</text>
+      <text x="120" y="370" text-anchor="middle" class="t2">Auth Code + PKCE</text>
+      <text x="120" y="386" text-anchor="middle" class="t2">tokens in memory</text>
+
+      <!-- sign-in to Keycloak -->
+      <path d="M220,170 H265 V52 H318" class="ln-id" marker-end="url(#a-id)"/>
+      <text x="271" y="112" class="lbl-id">sign in</text>
+      <text x="271" y="126" class="lbl-id">OIDC</text>
+
+      <!-- HTTPS to gateway -->
+      <line x1="220" y1="258" x2="318" y2="258" class="ln" marker-end="url(#a-ink)"/>
+      <text x="269" y="250" text-anchor="middle" class="lbl">HTTPS + JWT</text>
+
+      <!-- Keycloak -->
+      <rect x="320" y="20" width="180" height="64" rx="6" class="bx-id"/>
+      <text x="410" y="47" text-anchor="middle" class="t1">Keycloak · CIAM</text>
+      <text x="410" y="66" text-anchor="middle" class="t2">realm bank · :8180</text>
+
+      <!-- Gateway -->
+      <rect x="320" y="226" width="180" height="64" rx="6" class="bx"/>
+      <text x="410" y="253" text-anchor="middle" class="t1">API Gateway</text>
+      <text x="410" y="272" text-anchor="middle" class="t2">Spring Cloud · :8080</text>
+
+      <!-- JWKS -->
+      <line x1="410" y1="226" x2="410" y2="88" class="ln-id dash" marker-end="url(#a-id)"/>
+      <text x="418" y="160" class="lbl-id">fetches</text>
+      <text x="418" y="174" class="lbl-id">JWKS keys</text>
+
+      <!-- Observability -->
+      <rect x="980" y="20" width="180" height="64" rx="6" class="bx-dash"/>
+      <text x="1070" y="47" text-anchor="middle" class="t1">OpenTelemetry → Jaeger</text>
+      <text x="1070" y="66" text-anchor="middle" class="t2">every service · :16686</text>
+
+      <!-- Gateway routing trunk -->
+      <path d="M500,258 H530 V200 H1070" class="ln"/>
+      <line x1="650" y1="200" x2="650" y2="224" class="ln" marker-end="url(#a-ink)"/>
+      <line x1="860" y1="200" x2="860" y2="224" class="ln" marker-end="url(#a-ink)"/>
+      <line x1="1070" y1="200" x2="1070" y2="224" class="ln" marker-end="url(#a-ink)"/>
+      <text x="755" y="192" text-anchor="middle" class="lbl">routes /api/** by path</text>
+
+      <!-- Customer -> Keycloak admin API -->
+      <path d="M590,226 V60 H502" class="ln-id" marker-end="url(#a-id)"/>
+      <text x="598" y="112" class="lbl-id">Admin API</text>
+      <text x="598" y="126" class="lbl-id">lock user</text>
+
+      <!-- Services -->
+      <rect x="560" y="226" width="180" height="64" rx="6" class="bx"/>
+      <text x="650" y="253" text-anchor="middle" class="t1">Customer Service</text>
+      <text x="650" y="272" text-anchor="middle" class="t2">Java · :8081</text>
+      <rect x="770" y="226" width="180" height="64" rx="6" class="bx"/>
+      <text x="860" y="253" text-anchor="middle" class="t1">Account Service</text>
+      <text x="860" y="272" text-anchor="middle" class="t2">Java · :8082</text>
+      <rect x="980" y="226" width="180" height="64" rx="6" class="bx"/>
+      <text x="1070" y="253" text-anchor="middle" class="t1">Transfer Service</text>
+      <text x="1070" y="272" text-anchor="middle" class="t2">Java · saga · :8083</text>
+
+      <!-- DBs -->
+      <line x1="697" y1="290" x2="697" y2="316" class="ln-soft" marker-end="url(#a-soft)"/>
+      <rect x="655" y="318" width="85" height="34" rx="4" class="db"/>
+      <text x="697" y="339" text-anchor="middle" class="t3">customer_db</text>
+      <line x1="907" y1="290" x2="907" y2="316" class="ln-soft" marker-end="url(#a-soft)"/>
+      <rect x="865" y="318" width="85" height="34" rx="4" class="db"/>
+      <text x="907" y="339" text-anchor="middle" class="t3">account_db</text>
+      <line x1="1117" y1="290" x2="1117" y2="316" class="ln-soft" marker-end="url(#a-soft)"/>
+      <rect x="1075" y="318" width="85" height="34" rx="4" class="db"/>
+      <text x="1117" y="339" text-anchor="middle" class="t3">transfer_db</text>
+
+      <!-- Kafka pub/sub -->
+      <line x1="605" y1="294" x2="605" y2="406" class="ln-kf" marker-start="url(#a-kf)" marker-end="url(#a-kf)"/>
+      <line x1="815" y1="294" x2="815" y2="406" class="ln-kf" marker-start="url(#a-kf)" marker-end="url(#a-kf)"/>
+      <line x1="1025" y1="294" x2="1025" y2="406" class="ln-kf" marker-start="url(#a-kf)" marker-end="url(#a-kf)"/>
+      <text x="612" y="384" class="lbl-kf">publish + consume</text>
+
+      <!-- Kafka bar -->
+      <rect x="320" y="410" width="840" height="44" rx="6" class="bx-kf"/>
+      <text x="338" y="437" class="t1">Kafka</text>
+      <text x="400" y="437" class="t3">customer.events · account.events · transfer.commands · transfer.replies · transfer.events</text>
+
+      <!-- Kafka -> notification -->
+      <line x1="395" y1="456" x2="395" y2="506" class="ln-kf" marker-end="url(#a-kf)"/>
+      <text x="403" y="486" class="lbl-kf">consumes events</text>
+
+      <!-- Notification row -->
+      <rect x="320" y="510" width="150" height="64" rx="6" class="bx"/>
+      <text x="395" y="537" text-anchor="middle" class="t1">Notification</text>
+      <text x="395" y="556" text-anchor="middle" class="t2">consumer · .NET 10</text>
+      <line x1="470" y1="542" x2="527" y2="542" class="ln-mq" marker-end="url(#a-mq)"/>
+      <text x="499" y="534" text-anchor="middle" class="lbl-mq">enqueue</text>
+      <rect x="530" y="510" width="180" height="64" rx="6" class="bx-mq"/>
+      <text x="620" y="537" text-anchor="middle" class="t1">RabbitMQ</text>
+      <text x="620" y="556" text-anchor="middle" class="t2">email queue + DLQ</text>
+      <line x1="710" y1="542" x2="767" y2="542" class="ln-mq" marker-end="url(#a-mq)"/>
+      <text x="739" y="534" text-anchor="middle" class="lbl-mq">consume</text>
+      <rect x="770" y="510" width="150" height="64" rx="6" class="bx"/>
+      <text x="845" y="537" text-anchor="middle" class="t1">Notification</text>
+      <text x="845" y="556" text-anchor="middle" class="t2">sender · .NET 10</text>
+      <line x1="920" y1="542" x2="977" y2="542" class="ln" marker-end="url(#a-ink)"/>
+      <text x="949" y="534" text-anchor="middle" class="lbl">SMTP</text>
+      <rect x="980" y="510" width="180" height="64" rx="6" class="bx"/>
+      <text x="1070" y="537" text-anchor="middle" class="t1">Mailpit (dev SMTP)</text>
+      <text x="1070" y="556" text-anchor="middle" class="t2">inbox · :8025</text>
+    </svg>
+    </div>
+    <div class="legend">
+      <span><i style="border-color:var(--id)"></i>identity (Keycloak)</span>
+      <span><i style="border-color:var(--ink)"></i>synchronous HTTP</span>
+      <span><i style="border-color:var(--kf)"></i>Kafka events and commands</span>
+      <span><i style="border-color:var(--mq)"></i>RabbitMQ delivery queue</span>
+    </div>
+    <figcaption>Browsers only ever talk to Keycloak and the gateway. Services don't call each other directly. They coordinate through Kafka, so any one of them can be down without the others failing. The two notification boxes are one .NET deployable running two background workers, with RabbitMQ between them. One Postgres container hosts a separate database per service, and in production each would be its own instance.</figcaption>
+  </figure>
+
+  <h3>What each piece is responsible for</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Component</th><th>Tech</th><th>Owns</th></tr></thead>
+    <tbody>
+      <tr><td>Keycloak</td><td>Keycloak 26, realm <code>bank</code></td><td>Credentials, registration, email verification, MFA (TOTP), Google login, sessions, roles <code>customer</code> / <code>support_agent</code> / <code>admin</code>, step-up levels (ACR)</td></tr>
+      <tr><td>API Gateway</td><td>Spring Cloud Gateway</td><td>Single entry point: JWT signature check, CORS, rate limiting per user, routing, trace-ID injection. No business logic.</td></tr>
+      <tr><td>Customer Service</td><td>Spring Boot, clean arch</td><td>Customer profile (created on first login from the JWT <code>sub</code>), KYC status, consents, staff audit log, lock/unlock via Keycloak Admin API</td></tr>
+      <tr><td>Account Service</td><td>Spring Boot, clean arch</td><td>Accounts and balances. Opens checking + savings when <code>CustomerRegistered</code> arrives. Executes debit, credit and refund commands with optimistic locking.</td></tr>
+      <tr><td>Transfer Service</td><td>Spring Boot, clean arch</td><td>Transfer lifecycle and the saga orchestrator. Enforces step-up MFA above the configured amount. Idempotency keys. Limits read from its <code>transfer_config</code> table.</td></tr>
+      <tr><td>Notification Service</td><td>.NET 10 worker, clean arch</td><td>Turns events into emails. Kafka consumer → RabbitMQ quorum queue → sender with retry and dead-letter queue → SMTP. Templates in its database.</td></tr>
+      <tr><td>React portal</td><td>React + Vite + TypeScript</td><td>Customer UX: sign up, dashboard, transfers (with MFA prompt), security settings (MFA, sessions, consents)</td></tr>
+      <tr><td>Angular back-office</td><td>Angular (standalone components, signals)</td><td>Staff UX: customer search, KYC review, lock/unlock, audit trail. Role-guarded routes.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============ FLOWS ============ -->
+<section id="flows">
+  <h2>How the pieces work together</h2>
+  <p class="sub">Three flows cover almost every interview question about this system. Walk the interviewer through them in this order.</p>
+
+  <h3>Flow A · Sign in, then step up to MFA for a transfer</h3>
+  <p>The customer signs in with just a password. When they try a transfer above the threshold, the Transfer Service rejects the token because it lacks the MFA level. The React app then sends them back to Keycloak for a TOTP code and retries with the same idempotency key.</p>
+<pre class="mermaid">
+sequenceDiagram
+  autonumber
+  actor U as Customer
+  participant R as React portal
+  participant K as Keycloak
+  participant G as API Gateway
+  participant T as Transfer Service
+  U->>R: Sign in
+  R->>K: authorize with code_challenge (PKCE)
+  K-->>R: authorization code
+  R->>K: token request with code_verifier
+  K-->>R: access token, acr = 1 (password only)
+  U->>R: Send 500 to savings
+  R->>G: POST /api/transfers + Idempotency-Key
+  G->>T: forward (signature, issuer, expiry checked)
+  T-->>R: 401 insufficient_user_authentication, needs acr 2
+  R->>K: authorize again with acr_values = 2
+  K-->>U: prompt for TOTP code
+  K-->>R: new access token, acr = 2
+  R->>G: POST /api/transfers, same Idempotency-Key
+  G->>T: forward
+  T-->>R: 202 Accepted, status PENDING
+</pre>
+
+  <h3>Flow B · The transfer saga and the notification pipeline</h3>
+  <p>A transfer touches two accounts, but there is no distributed transaction. The Transfer Service orchestrates a saga: debit, then credit, and if the credit fails it refunds the debit. Every message a service publishes goes through its <b>transactional outbox</b>. The outbox row is written in the same database transaction as the state change, so a crash can never leave the database and Kafka out of sync.</p>
+<pre class="mermaid">
+sequenceDiagram
+  participant T as Transfer Service
+  participant KF as Kafka
+  participant A as Account Service
+  participant N as Notification (.NET)
+  participant MQ as RabbitMQ
+  Note over T: one DB transaction writes transfer PENDING + outbox row
+  T->>KF: DebitAccount (transfer.commands)
+  KF->>A: DebitAccount
+  Note over A: skip if event id already processed, debit with version check
+  A->>KF: AccountDebited (transfer.replies)
+  KF->>T: AccountDebited
+  T->>KF: CreditAccount
+  KF->>A: CreditAccount
+  alt credit succeeds
+    A->>KF: AccountCredited
+    KF->>T: AccountCredited
+    T->>KF: TransferCompleted (transfer.events)
+  else credit rejected, e.g. account closed
+    A->>KF: CreditRejected
+    KF->>T: CreditRejected
+    T->>KF: RefundAccount (compensation)
+    T->>KF: TransferFailed (transfer.events)
+  end
+  KF->>N: TransferCompleted or TransferFailed
+  N->>MQ: persist email job, wait for publisher confirm
+  MQ->>N: sender takes job, sends SMTP, acks
+  Note over N,MQ: 5 failed attempts with backoff, then the job moves to the dead-letter queue
+</pre>
+  <p>The React app polls <code>GET /api/transfers/{id}</code> until the status is <code>COMPLETED</code> or <code>FAILED</code>. The UI shows "pending" in between, which is eventual consistency showing up in the UX.</p>
+
+  <h3>Flow C · Staff locks a customer from the back-office</h3>
+  <ol class="steps">
+    <li>A <code>support_agent</code> signs in to the Angular app. The route guard checks the role claim before the page loads.</li>
+    <li>Angular calls <code>POST /api/admin/customers/{id}/lock</code>. The gateway routes it to the Customer Service, which re-checks the role with <code>@PreAuthorize</code>.</li>
+    <li>The Customer Service disables the user through the Keycloak Admin API and revokes their sessions, so the customer is signed out everywhere.</li>
+    <li>It writes an audit row (who, what, when, why) and publishes <code>CustomerLocked</code> through its outbox.</li>
+    <li>The Notification Service emails the customer, and the Account Service freezes outgoing transfers.</li>
+  </ol>
+
+  <div class="callout"><strong>Why both Kafka and RabbitMQ?</strong> Kafka is a durable, replayable log. Many services read the same event, each at its own pace, and ordering holds per key (we key by account ID). That makes it the right backbone. Sending email is a different job. Each message is independent, has to be delivered exactly once from our side, and needs its own retry timer. On a Kafka partition, one slow or failing email would block every message behind it. RabbitMQ acks each message separately, supports delayed retries and dead-letter queues, and a quorum queue keeps a job safe on disk until the SMTP send succeeds. So the notification service reads from Kafka and uses RabbitMQ as its outbound work queue.</div>
+</section>
+
+<!-- ============ STANDALONE ============ -->
+<section id="standalone">
+  <h2>How each piece runs on its own</h2>
+  <p class="sub">Every service can be started, tested and debugged in isolation. That is the practical payoff of the architecture, and interviewers like to ask about it.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Piece</th><th>Needs at runtime</th><th>Run it alone</th><th>Test it alone</th></tr></thead>
+    <tbody>
+      <tr><td>Keycloak</td><td>Postgres</td><td><code>docker compose up keycloak</code>. Realm and test users import on start.</td><td>Sign in at <code>:8180</code> as <code>alice</code></td></tr>
+      <tr><td>Customer / Account / Transfer</td><td>Postgres, Kafka, Keycloak public keys</td><td>Start infra with compose, then run <code>*Application.main</code> in IntelliJ (like F5 in Rider)</td><td>Domain: plain JUnit, no Spring. Integration: Testcontainers starts real Postgres + Kafka. JWTs are mocked.</td></tr>
+      <tr><td>API Gateway</td><td>Keycloak public keys, services</td><td>IntelliJ, or <code>./mvnw -pl services/api-gateway spring-boot:run</code></td><td>Route tests with WireMock standing in for the services</td></tr>
+      <tr><td>Notification (.NET)</td><td>Kafka, RabbitMQ, Postgres, SMTP</td><td><code>dotnet run --project src/Notification.Worker</code></td><td>xUnit + Testcontainers for .NET. Mailpit's API confirms the email arrived.</td></tr>
+      <tr><td>React portal</td><td>Keycloak, gateway</td><td><code>npm run dev</code></td><td>Vitest + React Testing Library. MSW fakes the API.</td></tr>
+      <tr><td>Angular back-office</td><td>Keycloak, gateway</td><td><code>ng serve</code></td><td><code>ng test</code>, with HttpTestingController faking the API</td></tr>
+      <tr><td>Whole system</td><td>—</td><td><code>docker compose --profile all up</code></td><td>Playwright: register → MFA → transfer → email in Mailpit</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============ CLEAN ARCH ============ -->
+<section id="clean">
+  <h2>Clean architecture</h2>
+  <p class="answer-yes">Yes, in every backend service.</p>
+  <p>Each Java service is a <b>Maven multi-module</b> project with four modules. It's the same shape as a .NET solution with Domain, Application, Infrastructure and Api projects, and the dependency rule is enforced the same way. A module can only import what its <code>pom.xml</code> declares, just as a <code>.csproj</code> can only use its project references. A wrong-direction import is therefore a <b>compile error</b>, not something a code review has to catch. An ArchUnit test (the Java version of NetArchTest) adds finer rules, such as "the domain may not import <code>org.springframework</code>".</p>
+
+  <figure>
+    <div class="scroll">
+    <svg class="dia" viewBox="0 0 900 460" role="img" aria-label="Clean architecture layers of the Transfer Service. The api module wires infrastructure and calls application use cases. Infrastructure implements ports defined in application. Application uses the domain. The domain depends on nothing. Each Java module maps to the equivalent .NET project.">
+      <defs>
+        <marker id="b-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-ink"/></marker>
+      </defs>
+      <text x="60" y="24" class="cap">Java · Maven modules (Transfer Service)</text>
+      <text x="640" y="24" class="cap">.NET equivalent</text>
+
+      <rect x="60" y="40" width="540" height="76" rx="8" class="bx"/>
+      <text x="80" y="70" class="t1">transfer-api</text>
+      <text x="80" y="93" class="t2">@SpringBootApplication · REST controllers · security · DI wiring</text>
+
+      <rect x="60" y="150" width="540" height="76" rx="8" class="bx"/>
+      <text x="80" y="180" class="t1">transfer-infrastructure</text>
+      <text x="80" y="203" class="t2">JPA + Flyway · Kafka producers and listeners · outbox relay</text>
+
+      <rect x="60" y="260" width="540" height="76" rx="8" class="bx"/>
+      <text x="80" y="290" class="t1">transfer-application</text>
+      <text x="80" y="313" class="t2">use cases: InitiateTransfer, HandleAccountDebited · ports</text>
+
+      <rect x="60" y="370" width="540" height="76" rx="8" class="bx-core"/>
+      <text x="80" y="400" class="t1">transfer-domain</text>
+      <text x="80" y="423" class="t2">Transfer aggregate · Money · status rules · events · no Spring</text>
+
+      <line x1="330" y1="116" x2="330" y2="148" class="ln" marker-end="url(#b-ink)"/>
+      <text x="340" y="137" class="lbl">wires via DI</text>
+      <line x1="330" y1="226" x2="330" y2="258" class="ln" marker-end="url(#b-ink)"/>
+      <text x="340" y="247" class="lbl">implements ports</text>
+      <line x1="330" y1="336" x2="330" y2="368" class="ln" marker-end="url(#b-ink)"/>
+      <text x="340" y="357" class="lbl">uses</text>
+      <path d="M60,78 H36 V298 H58" class="ln" marker-end="url(#b-ink)"/>
+      <text x="26" y="188" class="lbl" text-anchor="middle" transform="rotate(-90 26 188)">calls use cases</text>
+
+      <text x="620" y="84" text-anchor="middle" class="t1">≈</text>
+      <text x="620" y="194" text-anchor="middle" class="t1">≈</text>
+      <text x="620" y="304" text-anchor="middle" class="t1">≈</text>
+      <text x="620" y="414" text-anchor="middle" class="t1">≈</text>
+
+      <rect x="640" y="40" width="240" height="76" rx="8" class="bx-dash"/>
+      <text x="660" y="70" class="t1">Transfer.Api</text>
+      <text x="660" y="93" class="t2">ASP.NET Core, Program.cs</text>
+      <rect x="640" y="150" width="240" height="76" rx="8" class="bx-dash"/>
+      <text x="660" y="180" class="t1">Transfer.Infrastructure</text>
+      <text x="660" y="203" class="t2">EF Core, Confluent.Kafka</text>
+      <rect x="640" y="260" width="240" height="76" rx="8" class="bx-dash"/>
+      <text x="660" y="290" class="t1">Transfer.Application</text>
+      <text x="660" y="313" class="t2">handlers + interfaces</text>
+      <rect x="640" y="370" width="240" height="76" rx="8" class="bx-dash"/>
+      <text x="660" y="400" class="t1">Transfer.Domain</text>
+      <text x="660" y="423" class="t2">entities, value objects</text>
+    </svg>
+    </div>
+    <figcaption>Arrows point in the direction of compile-time dependency, always inward. The domain depends on nothing. The API module references infrastructure only to register implementations, the way <code>Program.cs</code> calls <code>AddInfrastructure()</code>.</figcaption>
+  </figure>
+
+  <h3>Where it applies, and where it doesn't</h3>
+  <ul class="plain">
+    <li><b>Customer, Account, Transfer, Notification:</b> full four-layer structure. The Notification Service uses the .NET layout you already know.</li>
+    <li><b>API Gateway:</b> no layers. It's configuration plus two filters, and adding layers would only add ceremony. This is a good point to make in the interview: apply the pattern where there is business logic to protect.</li>
+    <li><b>React and Angular:</b> the frontend version of the idea, feature folders (<code>features/transfers</code>) with <code>core/</code> for auth and HTTP and <code>shared/</code> for UI. Components never call <code>fetch</code> directly. They go through a feature's API service.</li>
+    <li><b>Mediator:</b> we won't add a MediatR equivalent. Use cases are plain classes behind interfaces, which is how Java teams usually do it.</li>
+  </ul>
+</section>
+
+<!-- ============ LAYOUT ============ -->
+<section id="layout">
+  <h2>Project layout</h2>
+  <p class="sub">A monorepo, so one clone runs everything and CI sees all of it.</p>
+
+<pre class="tree"><span class="h">ciam-banking-demo/</span>
+├── README.md                          <span class="c">how to run it + the 5-minute demo script</span>
+├── pom.xml                            <span class="c">parent POM: Java version, Spring Boot BOM, module list  (≈ .sln + Directory.Packages.props)</span>
+├── mvnw, .mvn/                        <span class="c">Maven wrapper pins the Maven version  (≈ global.json)</span>
+├── docker-compose.yml                 <span class="c">profiles: infra | apps | all</span>
+├── .env.example                       <span class="c">local-only ports and passwords</span>
+├── .github/workflows/                 <span class="c">ci-java.yml · ci-dotnet.yml · ci-frontend.yml · e2e.yml</span>
+│
+├── infra/
+│   ├── keycloak/realm-bank.json       <span class="c">realm, clients, roles, MFA + step-up flows, test users</span>
+│   ├── postgres/init.sql              <span class="c">creates keycloak_db, customer_db, account_db, transfer_db, notification_db</span>
+│   ├── kafka/create-topics.sh
+│   ├── rabbitmq/definitions.json      <span class="c">exchange, quorum queue, retry + dead-letter queues</span>
+│   └── otel/collector.yaml
+│
+├── contracts/events/                  <span class="c">JSON Schemas for every event. The language-neutral contract Java and C# both follow.</span>
+│
+├── libs/java-platform/                <span class="c">shared plumbing only: event envelope, outbox relay, JWT role mapping, problem+json errors</span>
+│
+├── services/
+│   ├── api-gateway/                   <span class="c">Spring Cloud Gateway, single module, no layers</span>
+│   ├── customer-service/              <span class="c">same 4-module shape as transfer-service</span>
+│   ├── account-service/               <span class="c">same 4-module shape</span>
+│   ├── <span class="h">transfer-service/</span>
+│   │   ├── pom.xml                    <span class="c">aggregator for the four modules below</span>
+│   │   ├── transfer-domain/
+│   │   ├── transfer-application/
+│   │   ├── transfer-infrastructure/
+│   │   └── transfer-api/              <span class="c">the runnable app + Dockerfile</span>
+│   └── <span class="h">notification-service/</span>          <span class="c">.NET 10</span>
+│       ├── NotificationService.sln
+│       ├── src/Notification.Domain/
+│       ├── src/Notification.Application/
+│       ├── src/Notification.Infrastructure/   <span class="c">Confluent.Kafka, RabbitMQ.Client, MailKit, EF Core</span>
+│       ├── src/Notification.Worker/           <span class="c">host with two BackgroundServices: consumer + sender</span>
+│       ├── tests/
+│       └── Dockerfile
+│
+├── frontends/
+│   ├── customer-portal-react/         <span class="c">Vite + React + TypeScript, react-oidc-context</span>
+│   └── backoffice-angular/            <span class="c">Angular CLI workspace, angular-auth-oidc-client</span>
+│
+├── e2e/                               <span class="c">Playwright tests against the full compose stack</span>
+└── docs/
+    ├── architecture.md
+    ├── interview-cheat-sheet.md
+    └── adr/                           <span class="c">decision records, e.g. 0002-kafka-plus-rabbitmq.md</span></pre>
+
+  <h3>Inside one Java service</h3>
+  <p>Two Java conventions will feel different from .NET. First, <b>the folder path is the namespace</b>: <code>com/ciambank/transfer/domain/Transfer.java</code> must declare <code>package com.ciambank.transfer.domain;</code>. Second, <b>tests live inside the same module</b>, under <code>src/test/java</code>, not in a separate test project.</p>
+<pre class="tree"><span class="h">transfer-service/</span>
+├── transfer-domain/
+│   ├── pom.xml                                   <span class="c">no Spring, no JPA. Plain Java.</span>
+│   └── src/
+│       ├── main/java/com/ciambank/transfer/domain/
+│       │   ├── Transfer.java                     <span class="c">aggregate root. Owns the status state machine.</span>
+│       │   ├── TransferStatus.java               <span class="c">PENDING → DEBITED → COMPLETED | COMPENSATING → FAILED</span>
+│       │   ├── Money.java                        <span class="c">record Money(BigDecimal amount, Currency currency)</span>
+│       │   └── event/TransferCompleted.java
+│       └── test/java/com/ciambank/transfer/domain/
+│           └── TransferTest.java                 <span class="c">plain JUnit, runs in milliseconds</span>
+│
+├── transfer-application/
+│   └── src/main/java/com/ciambank/transfer/application/
+│       ├── port/in/InitiateTransferUseCase.java  <span class="c">interface the controller calls</span>
+│       ├── port/out/TransferRepository.java      <span class="c">interface infrastructure implements</span>
+│       ├── port/out/CommandPublisher.java
+│       ├── port/out/TransferConfigProvider.java  <span class="c">limits + MFA threshold, read from the database</span>
+│       └── service/InitiateTransferService.java
+│
+├── transfer-infrastructure/
+│   └── src/main/
+│       ├── java/com/ciambank/transfer/infrastructure/
+│       │   ├── persistence/                      <span class="c">JPA entities, Spring Data repos, adapters mapping JPA ↔ domain</span>
+│       │   ├── messaging/                        <span class="c">KafkaCommandPublisher, AccountRepliesListener</span>
+│       │   └── config/JdbcTransferConfigProvider.java
+│       └── resources/db/migration/V1__create_transfer.sql   <span class="c">Flyway  (≈ EF migrations, but plain SQL)</span>
+│
+└── transfer-api/
+    ├── Dockerfile
+    └── src/
+        ├── main/java/com/ciambank/transfer/api/
+        │   ├── TransferApplication.java          <span class="c">@SpringBootApplication + main()  (≈ Program.cs)</span>
+        │   ├── web/TransferController.java
+        │   └── config/SecurityConfig.java
+        ├── main/resources/application.yml        <span class="c">(≈ appsettings.json), with application-local.yml per profile</span>
+        └── test/java/com/ciambank/transfer/api/
+            ├── ArchitectureTest.java             <span class="c">ArchUnit layer rules</span>
+            └── TransferApiIT.java                <span class="c">*IT = integration test, runs with Testcontainers</span></pre>
+</section>
+
+<!-- ============ BUILD ============ -->
+<section id="build">
+  <h2>Build, run, deploy</h2>
+  <p class="sub">Three loops: your inner dev loop, CI on every push, and the demo stack.</p>
+
+  <h3>Inner loop on your machine</h3>
+  <ol class="steps">
+    <li><code>docker compose --profile infra up -d</code> starts Postgres, Keycloak, Kafka (KRaft mode, no ZooKeeper), RabbitMQ, Mailpit and Jaeger.</li>
+    <li><code>./mvnw install</code> once, from the repo root. This is <code>dotnet build</code> for the whole solution, plus running tests and installing the modules into your local Maven cache.</li>
+    <li>Run the service you're working on from IntelliJ with the debugger attached. Run the others from compose (<code>--profile apps</code>) or IntelliJ.</li>
+    <li><code>npm run dev</code> / <code>ng serve</code> for whichever frontend you're changing. Both hot-reload.</li>
+  </ol>
+
+  <h3>Containers</h3>
+  <p>Each service has a multi-stage <code>Dockerfile</code>, the same pattern as a .NET <code>sdk</code> → <code>aspnet</code> build. For Java it's a JDK image that runs <code>mvnw package</code>, then a slim JRE image that runs the jar as a non-root user. The frontends build to static files served by nginx.</p>
+
+  <h3>CI on GitHub Actions</h3>
+<pre class="mermaid">
+flowchart LR
+  A[Push or pull request] --> B[Java: mvnw verify, unit + ArchUnit + Testcontainers]
+  A --> C[C# service: dotnet test]
+  A --> D[React + Angular: lint, test, build]
+  B --> E[E2E: compose up + Playwright]
+  C --> E
+  D --> E
+  E -->|main branch only| F[Build images, push to GHCR]
+</pre>
+  <p><b>Deployment scope:</b> for the interview the demo runs locally from compose, with images published to GitHub Container Registry. A Kubernetes or Azure Container Apps deployment is a possible later step. I'd leave it out of this week's work and describe how you'd do it instead (health probes via Spring Actuator, config from secrets, one deployment per service).</p>
+</section>
+
+<!-- ============ JAVA ============ -->
+<section id="java">
+  <h2>.NET → Java guide</h2>
+  <p class="sub">What you already know, and its name on the Java side. I'll point back to this table as we build each piece.</p>
+  <div class="tw"><table>
+    <thead><tr><th>.NET</th><th>Java / Spring</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td><code>dotnet</code> CLI</td><td><code>./mvnw</code></td><td><code>compile</code>, <code>test</code>, <code>verify</code>, <code>package</code>, <code>install</code> are lifecycle phases. Each one runs all the phases before it.</td></tr>
+      <tr><td>.sln + .csproj</td><td>parent <code>pom.xml</code> + module <code>pom.xml</code></td><td><code>&lt;modules&gt;</code> lists the projects. <code>&lt;dependency&gt;</code> is a ProjectReference or PackageReference.</td></tr>
+      <tr><td>Directory.Packages.props</td><td><code>&lt;dependencyManagement&gt;</code> + Spring Boot BOM</td><td>Versions are set once, and modules omit them</td></tr>
+      <tr><td>Program.cs, <code>builder.Services.Add…</code></td><td><code>@SpringBootApplication</code>, <code>@Configuration</code> + <code>@Bean</code></td><td>Spring also auto-scans for <code>@Component</code>/<code>@Service</code> classes. We'll use explicit <code>@Bean</code>s for the layers so the wiring stays visible.</td></tr>
+      <tr><td>appsettings.{Env}.json</td><td><code>application.yml</code> + <code>application-{profile}.yml</code></td><td><code>SPRING_PROFILES_ACTIVE</code> ≈ <code>ASPNETCORE_ENVIRONMENT</code></td></tr>
+      <tr><td><code>IOptions&lt;T&gt;</code></td><td><code>@ConfigurationProperties</code> record</td><td>Typed, validated config</td></tr>
+      <tr><td>ControllerBase, <code>[HttpGet]</code></td><td><code>@RestController</code>, <code>@GetMapping</code></td><td>Almost one-to-one</td></tr>
+      <tr><td>Middleware</td><td>Servlet filters, the Spring Security filter chain</td><td></td></tr>
+      <tr><td><code>AddJwtBearer</code></td><td><code>spring-boot-starter-oauth2-resource-server</code></td><td>Set <code>issuer-uri</code> and it fetches the JWKS keys itself</td></tr>
+      <tr><td><code>[Authorize(Roles=…)]</code></td><td><code>@PreAuthorize("hasRole('admin')")</code></td><td>Needs a converter that maps Keycloak's <code>realm_access.roles</code>. It goes in <code>libs/java-platform</code>.</td></tr>
+      <tr><td>EF Core DbContext</td><td>Spring Data JPA (Hibernate)</td><td>Repositories are interfaces, and Spring generates the implementation</td></tr>
+      <tr><td>EF migrations</td><td>Flyway</td><td>Hand-written SQL files <code>V1__…sql</code>, applied at startup</td></tr>
+      <tr><td>FluentValidation / DataAnnotations</td><td>Jakarta Bean Validation</td><td><code>@Valid</code>, <code>@NotNull</code>, <code>@Positive</code></td></tr>
+      <tr><td><code>async</code> / <code>await</code></td><td>Virtual threads</td><td>Write normal blocking code. The JVM parks the thread cheaply. There's no async coloring.</td></tr>
+      <tr><td>LINQ</td><td>Streams API</td><td><code>list.stream().filter(…).map(…).toList()</code></td></tr>
+      <tr><td><code>record</code></td><td><code>record</code></td><td>Same idea. We'll skip Lombok and use records.</td></tr>
+      <tr><td>xUnit · Moq · FluentAssertions</td><td>JUnit 5 · Mockito · AssertJ</td><td></td></tr>
+      <tr><td>WebApplicationFactory</td><td><code>@SpringBootTest</code> + MockMvc</td><td></td></tr>
+      <tr><td>NetArchTest</td><td>ArchUnit</td><td></td></tr>
+      <tr><td>Polly</td><td>Resilience4j</td><td>Retry, circuit breaker, bulkhead, timeouts</td></tr>
+      <tr><td>Serilog + OpenTelemetry</td><td>SLF4J/Logback + OpenTelemetry Java agent</td><td>The agent instruments HTTP, JDBC and Kafka with no code changes</td></tr>
+      <tr><td>Rider / Visual Studio</td><td>IntelliJ IDEA</td><td>Community Edition is enough</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Java gotchas that catch .NET developers</h3>
+  <ul class="plain">
+    <li><b><code>@Transactional</code> works through a proxy.</b> Calling a transactional method from another method in the <em>same class</em> skips the transaction. By default it also rolls back only on unchecked exceptions.</li>
+    <li><b>Checked exceptions.</b> The compiler makes you declare or catch them. Most modern Spring code uses unchecked (<code>RuntimeException</code>) ones.</li>
+    <li><b>No properties.</b> Records give you <code>amount()</code> accessors. JPA entities use getters.</li>
+    <li><b><code>==</code> on objects compares references.</b> Use <code>.equals()</code>, and <code>compareTo</code> for <code>BigDecimal</code>, where <code>1.0</code> and <code>1.00</code> are not <code>equals</code>.</li>
+    <li><b>Lazy loading outside a transaction</b> throws <code>LazyInitializationException</code>. We'll turn off <code>open-in-view</code> and map entities to domain objects inside the adapter.</li>
+    <li><b>Nullability.</b> There's no <code>string?</code>. Use <code>Optional</code> for return values and validation annotations at the edges.</li>
+  </ul>
+</section>
+
+<!-- ============ CHEAT SHEET ============ -->
+<section id="cheatsheet">
+  <h2>Interview cheat sheet</h2>
+  <p class="sub">Likely questions for each requirement, a short strong answer, and where the demo proves it. Quiz mode hides the answers so you can test yourself.</p>
+
+  <div class="cs-bar" role="toolbar" aria-label="Filter questions">
+    <button class="chip" type="button" data-f="all" aria-pressed="true">All</button>
+    <button class="chip" type="button" data-f="exp" aria-pressed="false">Experience</button>
+    <button class="chip" type="button" data-f="ciam" aria-pressed="false">CIAM</button>
+    <button class="chip" type="button" data-f="ms" aria-pressed="false">Microservices</button>
+    <button class="chip" type="button" data-f="java" aria-pressed="false">Java</button>
+    <button class="chip" type="button" data-f="fe" aria-pressed="false">Angular + React</button>
+    <button class="chip" type="button" data-f="fs" aria-pressed="false">Full stack</button>
+    <button class="chip" type="button" data-f="mgr" aria-pressed="false">Leadership</button>
+    <button class="chip" type="button" data-f="nice" aria-pressed="false">C# + Corillian</button>
+    <button class="toggle" type="button" id="quizToggle" aria-pressed="false">Quiz mode: off</button>
+  </div>
+
+  <div class="cards" id="cards">
+
+    <!-- EXPERIENCE -->
+    <article class="qa" data-c="exp"><span class="tag">Experience</span>
+      <h4>"How many years of total experience, and how many as a Senior Technical Manager?"</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Give the numbers first, then one sentence of scope for each. Fill in your own figures:</p>
+      <p>"I have <span class="fill">__</span> years in software, 25 of them on .NET and about 10 in Java. For <span class="fill">__</span> of those years I've been a senior technical manager, leading <span class="fill">__</span> engineers across <span class="fill">__</span> teams and owning delivery of <span class="fill">__</span>. I've stayed hands-on the whole time. This week I built a CIAM-secured microservices banking demo in Java, Angular and React to show where my skills are today."</p></div>
+      <p class="demo"><b>In the demo:</b> the whole repo is proof of current hands-on skill</p>
+    </article>
+
+    <!-- CIAM -->
+    <article class="qa" data-c="ciam"><span class="tag">CIAM</span>
+      <h4>How is CIAM different from workforce IAM?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>CIAM serves customers at scale: millions of users who sign themselves up. It has to balance security with conversion, so it includes self-registration, social login, progressive profiling, consent and privacy regulations (GDPR, CCPA, GLBA for banks) and account-takeover defenses. Workforce IAM serves employees who are provisioned by HR (SCIM), with SSO into internal apps and device policies. Lost sign-ups aren't a concern there, but insider risk is.</p></div>
+      <p class="demo"><b>In the demo:</b> Keycloak realm with self-registration, Google login, consents page, brute-force lockout</p>
+    </article>
+
+    <article class="qa" data-c="ciam"><span class="tag">CIAM</span>
+      <h4>Explain OAuth 2.0 vs OpenID Connect vs SAML.</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>OAuth 2.0 is delegated <em>authorization</em>: an access token that lets a client call an API. OIDC adds <em>authentication</em> on top of it, with an ID token saying who the user is, plus discovery and userinfo endpoints. SAML is the older XML-based federation standard. It's still common for enterprise SSO and legacy banking platforms. New customer-facing apps use OIDC, and SAML appears when you federate with partners or older systems.</p></div>
+      <p class="demo"><b>In the demo:</b> both SPAs use OIDC. Keycloak can also broker a SAML identity provider if asked.</p>
+    </article>
+
+    <article class="qa" data-c="ciam"><span class="tag">CIAM</span>
+      <h4>Why Authorization Code + PKCE for a single-page app?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>A browser app can't keep a client secret. The implicit flow put tokens in the URL and is deprecated. With PKCE, the app creates a random <code>code_verifier</code> and sends only its hash when the flow starts. To exchange the code for tokens it must show the original verifier, so a stolen authorization code is useless to an attacker.</p></div>
+      <p class="demo"><b>In the demo:</b> Flow A, steps 2–5</p>
+    </article>
+
+    <article class="qa" data-c="ciam"><span class="tag">CIAM</span>
+      <h4>Where should an SPA store tokens? Is that good enough for a bank?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>In memory, never in localStorage, because any XSS could read it. Use short-lived access tokens (5 minutes) and refresh-token rotation. For a production bank I'd go further with the <b>backend-for-frontend (BFF)</b> pattern. A small server does the OAuth flow and keeps the tokens, and the browser only gets an httpOnly, SameSite session cookie, so tokens never reach JavaScript. It's the approach the current IETF browser-app guidance recommends for high-risk apps.</p></div>
+      <p class="demo"><b>In the demo:</b> in-memory tokens. The BFF is the "what I'd do in production" answer.</p>
+    </article>
+
+    <article class="qa" data-c="ciam"><span class="tag">CIAM</span>
+      <h4>How do you require MFA only for risky actions?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Step-up authentication. Keycloak assigns authentication levels (the <code>acr</code> claim): level 1 for password, level 2 for password + TOTP. The Transfer Service checks the claim against a configured threshold amount. If the level is too low, it returns 401 with <code>error="insufficient_user_authentication"</code> (RFC 9470). The client re-authenticates with <code>acr_values=2</code> and retries. Low-friction sign-in, strong protection where the money moves.</p></div>
+      <p class="demo"><b>In the demo:</b> Flow A, steps 9–15. The threshold lives in <code>transfer_config</code>.</p>
+    </article>
+
+    <article class="qa" data-c="ciam"><span class="tag">CIAM</span>
+      <h4>How do microservices validate tokens?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Locally, using Keycloak's public keys (JWKS, cached): check the signature, <code>iss</code>, <code>aud</code>, <code>exp</code>, then roles and scopes. The gateway checks at the edge, and each service checks again, because a request reaching the service might not have come through the gateway (zero trust). Calling the introspection endpoint on every request adds latency and a single point of failure. That's why tokens are short-lived rather than revocable.</p></div>
+      <p class="demo"><b>In the demo:</b> dashed "JWKS keys" line in the architecture diagram, plus <code>SecurityConfig</code> in every service</p>
+    </article>
+
+    <article class="qa" data-c="ciam"><span class="tag">CIAM</span>
+      <h4>How do you defend against account takeover?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Use layers. MFA and step-up. Brute-force detection with lockout. Breached-password checks. Rate limiting per IP and per user at the gateway. Risk signals such as new device or impossible travel. Short sessions for sensitive actions. Notify the customer about security events (password change, new device, MFA removed) so they can react quickly.</p></div>
+      <p class="demo"><b>In the demo:</b> Keycloak brute-force settings, gateway rate limiter, notification emails for security events</p>
+    </article>
+
+    <article class="qa" data-c="ciam"><span class="tag">CIAM</span>
+      <h4>How would you migrate millions of users off a legacy login without forcing password resets?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Lazy migration. Keycloak's User Storage SPI checks credentials against the legacy system on a user's first login, then imports the user and re-hashes the password with the modern algorithm. Active users move over invisibly. After a cut-off date, the remaining dormant accounts go through a reset-by-email flow. Run both systems in parallel, measure migration percentage, and roll back per segment if needed.</p></div>
+      <p class="demo"><b>In the demo:</b> discussion only. It pairs well with the Corillian modernization story.</p>
+    </article>
+
+    <article class="qa" data-c="ciam"><span class="tag">CIAM</span>
+      <h4>How do you handle consent and the right to be forgotten across services?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Record each consent with its purpose, policy version and timestamp, and make it withdrawable. For erasure, publish a <code>CustomerErased</code> event. Every service that holds personal data must act on it, deleting or anonymizing and keeping only what regulation requires (banks must keep transaction records). Include erasure in each service's contract tests so a new service can't forget it.</p></div>
+      <p class="demo"><b>In the demo:</b> consents page in React, consent table in the Customer Service</p>
+    </article>
+
+    <!-- MICROSERVICES -->
+    <article class="qa" data-c="ms"><span class="tag">Microservices</span>
+      <h4>How do you decide service boundaries?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Use DDD bounded contexts: a service owns one business capability and its data. Align services with teams (Conway's law), so each team can deploy without coordinating. If two services always change together, they're really one service. I'd start with a modular monolith when the domain is unclear. Microservices pay off when teams and scaling needs are really independent.</p></div>
+      <p class="demo"><b>In the demo:</b> Customer, Account and Transfer are three separate contexts, each with its own database</p>
+    </article>
+
+    <article class="qa" data-c="ms"><span class="tag">Microservices</span>
+      <h4>How do you keep data consistent without distributed transactions?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>With a saga: a series of local transactions, each with a compensating action. With orchestration, one service drives the steps, which is easy to follow and debug. With choreography, services react to each other's events, which gives looser coupling but makes the overall flow harder to see. I used orchestration for transfers because money flows need a clear owner and an auditable state machine.</p></div>
+      <p class="demo"><b>In the demo:</b> Flow B, including the refund compensation</p>
+    </article>
+
+    <article class="qa" data-c="ms"><span class="tag">Microservices</span>
+      <h4>What is the dual-write problem?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>A service that writes to its database and then publishes to Kafka can crash in between. The two then disagree forever. The transactional outbox fixes it: write the event to an <code>outbox</code> table in the <em>same</em> database transaction, and a relay publishes it afterward. That gives at-least-once delivery, so consumers must be idempotent.</p></div>
+      <p class="demo"><b>In the demo:</b> <code>libs/java-platform</code> outbox relay, used by all three Java services</p>
+    </article>
+
+    <article class="qa" data-c="ms"><span class="tag">Microservices</span>
+      <h4>How do you avoid charging someone twice?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Idempotency at two levels. The API takes an <code>Idempotency-Key</code> header, and a retried POST returns the original result. Each consumer records processed event IDs in the same transaction as its state change and skips duplicates. Optimistic locking (<code>@Version</code>) on the balance stops two concurrent debits from both succeeding.</p></div>
+      <p class="demo"><b>In the demo:</b> Flow A step 13 reuses the key. Account Service keeps a <code>processed_events</code> table.</p>
+    </article>
+
+    <article class="qa" data-c="ms"><span class="tag">Microservices</span>
+      <h4>Why use Kafka and RabbitMQ together?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>They solve different problems. Kafka is a replayable log with many independent consumer groups and ordering per key, which makes it the event backbone. RabbitMQ is a task queue with per-message acks, delayed retries and dead-letter queues. Email delivery needs independent retries, and a slow email must not block others in a Kafka partition. So the notification service reads Kafka and puts each email job on a durable quorum queue.</p></div>
+      <p class="demo"><b>In the demo:</b> bottom row of the architecture diagram. Recorded as ADR 0002.</p>
+    </article>
+
+    <article class="qa" data-c="ms"><span class="tag">Microservices</span>
+      <h4>How do you stop one failing service from taking down the rest?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Prefer asynchronous messaging, so a service that's down just builds a backlog. Where calls are synchronous, give each one a timeout, retries with exponential backoff and jitter (idempotent calls only), a circuit breaker, and a bulkhead to cap concurrent calls. Rate-limit at the gateway. Degrade gracefully by showing cached or "pending" state instead of an error.</p></div>
+      <p class="demo"><b>In the demo:</b> Resilience4j on the Customer → Keycloak Admin API call. Stop the Account Service during a transfer and it completes after restart.</p>
+    </article>
+
+    <article class="qa" data-c="ms"><span class="tag">Microservices</span>
+      <h4>How do you debug a request that crosses five services?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Distributed tracing. OpenTelemetry propagates a trace ID through HTTP headers <em>and</em> Kafka message headers, and every log line includes it. In Jaeger you see the whole transfer as one trace with timings per hop. Add RED metrics (rate, errors, duration) per service and alert on SLOs rather than on CPU.</p></div>
+      <p class="demo"><b>In the demo:</b> open Jaeger at <code>:16686</code> and show one transfer spanning gateway → Transfer → Kafka → Account → Notification</p>
+    </article>
+
+    <article class="qa" data-c="ms"><span class="tag">Microservices</span>
+      <h4>How do you evolve event contracts without breaking consumers?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Make only additive changes. Consumers act as tolerant readers and ignore unknown fields. Put a version in the event envelope. For breaking changes, publish a new event type alongside the old one and retire the old one once consumers have moved. A schema registry or checked-in JSON Schemas with contract tests catch mistakes in CI.</p></div>
+      <p class="demo"><b>In the demo:</b> <code>contracts/events/*.schema.json</code>, validated by both the Java and C# tests</p>
+    </article>
+
+    <article class="qa" data-c="ms"><span class="tag">Microservices</span>
+      <h4>What's your testing strategy for microservices?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Mostly fast unit tests on the domain, which has no framework dependencies. Integration tests per service with Testcontainers use real Postgres and Kafka, not mocks. Contract tests on events and APIs check that services agree. A handful of end-to-end tests cover the critical journeys. Architecture tests keep the layers honest.</p></div>
+      <p class="demo"><b>In the demo:</b> every layer of the pyramid runs in CI</p>
+    </article>
+
+    <!-- JAVA -->
+    <article class="qa" data-c="java"><span class="tag">Java</span>
+      <h4>Which modern Java features do you use?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Records for value objects and DTOs. Sealed interfaces with pattern-matching <code>switch</code>, so the compiler checks that every event type is handled. Virtual threads, so ordinary blocking code scales like async code. Text blocks for SQL. <code>var</code> for local variables.</p></div>
+      <p class="demo"><b>In the demo:</b> <code>Money</code> record, sealed <code>TransferEvent</code> hierarchy, virtual threads enabled in <code>application.yml</code></p>
+    </article>
+
+    <article class="qa" data-c="java"><span class="tag">Java</span>
+      <h4>What are the pitfalls of <code>@Transactional</code>?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>It's proxy-based. Self-invocation within the same class bypasses it, and it only applies to public methods called from outside the class. By default it rolls back only on unchecked exceptions. Keep transactions short, and never make a network call (Kafka, HTTP) inside one. That's exactly why the outbox exists.</p></div>
+      <p class="demo"><b>In the demo:</b> transactions sit on the application service methods. Publishing goes through the outbox.</p>
+    </article>
+
+    <article class="qa" data-c="java"><span class="tag">Java</span>
+      <h4>How do you avoid N+1 queries in JPA?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Use fetch joins or <code>@EntityGraph</code> for known access patterns, and DTO projections for read screens. Disable <code>open-in-view</code> so lazy loading can't hide in the web layer. Turn on SQL logging or Hibernate statistics in tests to catch regressions.</p></div>
+      <p class="demo"><b>In the demo:</b> the back-office customer detail page uses a projection query</p>
+    </article>
+
+    <article class="qa" data-c="java"><span class="tag">Java</span>
+      <h4>How do you handle money and concurrent balance updates?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Use <code>BigDecimal</code> with an explicit currency and rounding mode, never <code>double</code>. Wrap it in a <code>Money</code> value object so the rules live in one place. For concurrency, use optimistic locking with <code>@Version</code> and retry on conflict. Use pessimistic <code>SELECT … FOR UPDATE</code> only when contention is high.</p></div>
+      <p class="demo"><b>In the demo:</b> <code>Money</code> in the domain, <code>@Version</code> on the account entity</p>
+    </article>
+
+    <article class="qa" data-c="java"><span class="tag">Java</span>
+      <h4>How do you secure a Spring Boot API with Keycloak?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Add the OAuth2 resource-server starter and set <code>issuer-uri</code>, and Spring fetches the JWKS and validates tokens. Add a <code>JwtAuthenticationConverter</code> that maps Keycloak's <code>realm_access.roles</code> to authorities. Then use <code>@PreAuthorize</code> on use-case entry points. The API should be stateless: no sessions and no CSRF tokens, because it uses bearer tokens.</p></div>
+      <p class="demo"><b>In the demo:</b> shared converter in <code>libs/java-platform</code></p>
+    </article>
+
+    <article class="qa" data-c="java"><span class="tag">Java</span>
+      <h4>How do you run the JVM well in containers?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Recent JVMs read container memory limits. Size the heap with <code>-XX:MaxRAMPercentage</code> rather than fixed <code>-Xmx</code>. G1 is the right default collector, and ZGC suits low-latency needs. Run as a non-root user on a slim JRE image. For faster startup there's class-data sharing, or GraalVM native images for scale-to-zero.</p></div>
+      <p class="demo"><b>In the demo:</b> the service Dockerfiles</p>
+    </article>
+
+    <!-- FRONTEND -->
+    <article class="qa" data-c="fe"><span class="tag">Angular + React</span>
+      <h4>When would you choose Angular over React?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Angular is a complete, opinionated framework: DI, router, forms, HTTP and testing are built in, and every Angular codebase looks alike. That suits large enterprise teams and forms-heavy internal apps. React is a UI library where you choose the router, data fetching and state tools. It's more flexible, has a huge ecosystem, and suits customer-facing products that iterate quickly. That's why the demo uses Angular for staff and React for customers.</p></div>
+      <p class="demo"><b>In the demo:</b> both frontends against the same APIs and the same Keycloak realm</p>
+    </article>
+
+    <article class="qa" data-c="fe"><span class="tag">Angular + React</span>
+      <h4>How does change detection differ?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>React re-renders a component when its state or props change and reconciles against the virtual DOM. You optimize with <code>memo</code>, stable callbacks, and by keeping state local. Modern Angular uses signals: fine-grained reactive values that update exactly the bindings that depend on them, without zone.js. Older Angular relied on zone.js to trigger checks and <code>OnPush</code> to limit them.</p></div>
+      <p class="demo"><b>In the demo:</b> Angular back-office uses signals throughout</p>
+    </article>
+
+    <article class="qa" data-c="fe"><span class="tag">Angular + React</span>
+      <h4>How do you implement auth in each framework?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>In Angular, an OIDC client library, an <code>HttpInterceptor</code> that attaches the token, and functional route guards (<code>CanActivateFn</code>) that check roles. In React, an auth context provider, a protected-route component, and a fetch wrapper that attaches the token and handles the step-up 401. In both, the UI hides what a user can't do, but the API is what actually enforces it.</p></div>
+      <p class="demo"><b>In the demo:</b> <code>core/auth</code> folder in each frontend</p>
+    </article>
+
+    <article class="qa" data-c="fe"><span class="tag">Angular + React</span>
+      <h4>How do you manage state?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Separate server state from UI state. In React, TanStack Query handles server state (caching, retries, polling), and <code>useState</code>/context handles the rest. In Angular, services exposing signals, plus <code>resource()</code> or RxJS for async. I add a global store (Redux/NgRx) only when many distant components share complex client state, which is rarer than people think.</p></div>
+      <p class="demo"><b>In the demo:</b> TanStack Query polls the transfer status</p>
+    </article>
+
+    <article class="qa" data-c="fe"><span class="tag">Angular + React</span>
+      <h4>What frontend security concerns matter for banking?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>XSS above all. Rely on framework escaping, and never use <code>innerHTML</code> or <code>dangerouslySetInnerHTML</code> with user data. Set a strict Content-Security-Policy. Keep tokens out of storage. Use CSRF protection if you switch to cookies (BFF). Audit dependencies and pin versions. Don't log personal data to the console or to analytics.</p></div>
+      <p class="demo"><b>In the demo:</b> CSP headers from nginx in both frontend containers</p>
+    </article>
+
+    <!-- FULL STACK -->
+    <article class="qa" data-c="fs"><span class="tag">Full stack</span>
+      <h4>Walk me through what happens when a customer sends money.</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Tell Flow A, then Flow B: PKCE sign-in, the step-up 401, the retry with the same idempotency key, the 202 response, the outbox, the saga's debit and credit, the compensation path, and the email via RabbitMQ. Finish by showing the Jaeger trace. This one answer covers CIAM, microservices, Java, frontend and C#.</p></div>
+      <p class="demo"><b>In the demo:</b> have the app and Jaeger open, ready to share your screen</p>
+    </article>
+
+    <article class="qa" data-c="fs"><span class="tag">Full stack</span>
+      <h4>How do you design REST APIs?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Resource-oriented URLs. Correct status codes, including <code>202 Accepted</code> with a status URL for asynchronous work. Errors as <code>application/problem+json</code> (RFC 9457). Cursor pagination. Idempotency keys on unsafe operations. Versioning in the URL. An OpenAPI spec generated from code and published.</p></div>
+      <p class="demo"><b>In the demo:</b> Swagger UI on each service. Shared problem+json handler.</p>
+    </article>
+
+    <article class="qa" data-c="fs"><span class="tag">Full stack</span>
+      <h4>How would this scale to millions of customers?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Services are stateless, so they scale horizontally behind the gateway. Kafka partitions keyed by account ID keep ordering per account while spreading load. Postgres gets read replicas and, eventually, partitioning. Keycloak runs clustered with a distributed cache. Static frontends go on a CDN. Watch the actual bottleneck, usually the database, before adding complexity.</p></div>
+      <p class="demo"><b>In the demo:</b> discussion, backed by the partition-key choice in the code</p>
+    </article>
+
+    <!-- LEADERSHIP -->
+    <article class="qa" data-c="mgr"><span class="tag">Leadership</span>
+      <h4>How do you stay technical as a manager?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>I own the architecture decision records and review designs, not every pull request. I pair on the hardest problem each quarter and build proofs of concept before committing a team to a technology. This demo is an example: I built it to check my understanding of the current stack rather than rely on what I knew before.</p></div>
+      <p class="demo"><b>In the demo:</b> <code>docs/adr/</code></p>
+    </article>
+
+    <article class="qa" data-c="mgr"><span class="tag">Leadership</span>
+      <h4>How would you organize teams around this platform?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Stream-aligned teams per business domain: Identity &amp; Profile, Payments (accounts and transfers), and Digital Channels (the frontends). A small platform team owns the gateway, Kafka, CI and observability, so the domain teams move fast. Each team owns its services end to end, including on-call.</p></div>
+      <p class="demo"><b>In the demo:</b> the service boundaries match these teams</p>
+    </article>
+
+    <article class="qa" data-c="mgr"><span class="tag">Leadership</span>
+      <h4>How do you balance tech debt against feature delivery?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Make debt visible in a register with business impact (risk, speed, cost). Reserve a steady share of capacity, about 15–20%. Tie big paydowns to outcomes the business cares about, such as faster releases or fewer incidents. Say "no" to new debt in security-critical paths. Prepare one STAR story where this paid off: <span class="fill">your story</span>.</p></div>
+      <p class="demo"><b>In the demo:</b> —</p>
+    </article>
+
+    <article class="qa" data-c="mgr"><span class="tag">Leadership</span>
+      <h4>Tell me about a production incident you led.</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Use the STAR structure: <span class="fill">Situation · Task · Action · Result</span>. Mention an incident commander role separate from the people fixing it, regular stakeholder updates, restoring service before finding the root cause, a blameless post-mortem, and action items with owners and dates.</p></div>
+      <p class="demo"><b>In the demo:</b> DLQ + tracing show you design for incidents</p>
+    </article>
+
+    <article class="qa" data-c="mgr"><span class="tag">Leadership</span>
+      <h4>How do you hire and grow senior engineers?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Hire with structured interviews and a realistic work sample, scored against a rubric. Grow people with clear leveling expectations, stretch ownership (let them lead a design, not just implement one), regular 1:1s focused on their goals, and visible credit. Include a concrete example: <span class="fill">person you promoted</span>.</p></div>
+      <p class="demo"><b>In the demo:</b> —</p>
+    </article>
+
+    <!-- NICE TO HAVE -->
+    <article class="qa" data-c="nice"><span class="tag">C# + Corillian</span>
+      <h4>Why is one service in C#?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>To show that the contract between services is the event schema, not the language. Teams can use the best tool for them as long as they honor the contracts. The .NET service uses the same clean-architecture layout, a <code>BackgroundService</code> per worker, RabbitMQ publisher confirms and quorum queues, and Testcontainers. It also plays to 25 years of C#.</p></div>
+      <p class="demo"><b>In the demo:</b> <code>services/notification-service</code></p>
+    </article>
+
+    <article class="qa" data-c="nice"><span class="tag">C# + Corillian</span>
+      <h4>What do you know about Corillian, and how would you modernize it?</h4>
+      <button class="reveal" type="button">Show answer</button>
+      <div class="a"><p>Corillian built online-banking software (the Voyager platform) and was acquired by Fiserv in 2007. You're likely to meet it as a legacy platform to integrate with or move off. If you've worked with it, lead with that. For modernization, use the strangler-fig pattern: put a gateway in front, move identity to CIAM first with lazy migration, then carve out capabilities one at a time (notifications, then transfers). Sync data with change-data capture while both systems run, and switch traffic per customer segment.</p></div>
+      <p class="demo"><b>In the demo:</b> the gateway + CIAM + event architecture is the target state of that migration</p>
+    </article>
+
+  </div>
+</section>
+
+<!-- ============ PLAN ============ -->
+<section id="plan">
+  <h2>Build plan</h2>
+  <p class="sub">Seven phases, in dependency order. After each one I stop, walk you through what was built and why, and you run it yourself before we continue.</p>
+  <div>
+    <div class="phase"><div class="n">1</div><div><p><b>Foundation.</b> Repo, parent POM, compose infra, Keycloak realm with MFA and step-up flows, Kafka topics, RabbitMQ definitions, CI skeleton.</p><p class="chk">You check: sign in to Keycloak as a test user and set up TOTP.</p></div></div>
+    <div class="phase"><div class="n">2</div><div><p><b>Customer + Account services.</b> Four-module clean architecture, Flyway, JWT security, outbox, ArchUnit tests. Account opens when a customer registers.</p><p class="chk">You check: step through a request in the IntelliJ debugger, then run the tests.</p></div></div>
+    <div class="phase"><div class="n">3</div><div><p><b>Transfer Service.</b> Saga orchestrator, idempotency keys, step-up check against the configured threshold, compensation path.</p><p class="chk">You check: kill the Account Service mid-transfer and watch it recover.</p></div></div>
+    <div class="phase"><div class="n">4</div><div><p><b>Notification Service (.NET).</b> Kafka consumer, RabbitMQ quorum queue with retry and DLQ, SMTP sender, templates in the database.</p><p class="chk">You check: the email arrives in Mailpit. Break SMTP and watch the job reach the DLQ.</p></div></div>
+    <div class="phase"><div class="n">5</div><div><p><b>React customer portal.</b> Registration, dashboard, transfer with step-up prompt, security settings.</p><p class="chk">You check: the full customer journey in the browser.</p></div></div>
+    <div class="phase"><div class="n">6</div><div><p><b>Angular back-office.</b> Role guards, customer search, KYC review, lock/unlock, audit trail.</p><p class="chk">You check: lock a customer and see them signed out of the React app.</p></div></div>
+    <div class="phase"><div class="n">7</div><div><p><b>Gateway, tracing and polish.</b> Rate limiting, OpenTelemetry → Jaeger, Playwright end-to-end tests, README demo script, docs, push to GitHub.</p><p class="chk">You check: one Jaeger trace for a transfer, then rehearse the 5-minute demo.</p></div></div>
+  </div>
+</section>
+</main>
+</div>
+
+<script>
+(function(){
+  // Zoom, pan and expand controls for every diagram
+  document.querySelectorAll('figure .scroll, pre.mermaid').forEach(function(el){
+    var w = document.createElement('div'); w.className = 'zw';
+    var bar = document.createElement('div'); bar.className = 'zbar';
+    var view = document.createElement('div'); view.className = 'zview';
+    function btn(t, label){ var b = document.createElement('button'); b.type = 'button'; b.textContent = t; b.setAttribute('aria-label', label); bar.appendChild(b); return b; }
+    var out = btn('−', 'Zoom out');
+    var lbl = document.createElement('span'); lbl.className = 'zl'; bar.appendChild(lbl);
+    var inn = btn('+', 'Zoom in');
+    var fit = btn('Reset', 'Reset zoom');
+    var full = btn('Expand', 'Expand diagram to full window');
+    el.parentNode.insertBefore(w, el);
+    w.appendChild(bar); w.appendChild(view); view.appendChild(el);
+    var z = 1;
+    function set(v){ z = Math.min(4, Math.max(0.5, Math.round(v * 100) / 100)); el.style.zoom = z; lbl.textContent = Math.round(z * 100) + '%'; }
+    set(1);
+    out.onclick = function(){ set(z - 0.25); };
+    inn.onclick = function(){ set(z + 0.25); };
+    fit.onclick = function(){ set(1); view.scrollTo(0, 0); };
+    full.onclick = function(){ var on = !w.classList.contains('full'); w.classList.toggle('full', on); full.textContent = on ? 'Close' : 'Expand'; document.body.style.overflow = on ? 'hidden' : ''; };
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && w.classList.contains('full')) full.click(); });
+    view.addEventListener('wheel', function(e){ if (e.ctrlKey || e.metaKey) { e.preventDefault(); set(z + (e.deltaY < 0 ? 0.1 : -0.1)); } }, {passive:false});
+    var sx, sy, sl, st, down = false;
+    view.addEventListener('pointerdown', function(e){ if (e.pointerType !== 'mouse') return; down = true; sx = e.clientX; sy = e.clientY; sl = view.scrollLeft; st = view.scrollTop; view.classList.add('drag'); });
+    window.addEventListener('pointermove', function(e){ if (!down) return; view.scrollLeft = sl - (e.clientX - sx); view.scrollTop = st - (e.clientY - sy); });
+    window.addEventListener('pointerup', function(){ down = false; view.classList.remove('drag'); });
+  });
+
+  var chips = document.querySelectorAll('.chip');
+  var cards = document.querySelectorAll('.qa');
+  chips.forEach(function(chip){
+    chip.addEventListener('click', function(){
+      var f = chip.getAttribute('data-f');
+      chips.forEach(function(c){ c.setAttribute('aria-pressed', c === chip ? 'true' : 'false'); });
+      cards.forEach(function(card){ card.hidden = !(f === 'all' || card.getAttribute('data-c') === f); });
+    });
+  });
+  var box = document.getElementById('cards');
+  var toggle = document.getElementById('quizToggle');
+  toggle.addEventListener('click', function(){
+    var on = !box.classList.contains('quiz');
+    box.classList.toggle('quiz', on);
+    cards.forEach(function(c){ c.classList.remove('open'); });
+    toggle.setAttribute('aria-pressed', on ? 'true' : 'false');
+    toggle.textContent = 'Quiz mode: ' + (on ? 'on' : 'off');
+  });
+  document.querySelectorAll('.reveal').forEach(function(btn){
+    btn.addEventListener('click', function(){ btn.closest('.qa').classList.add('open'); });
+  });
+})();
+</script>

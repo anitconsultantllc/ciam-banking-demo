@@ -1,0 +1,137 @@
+# Local stack for the CIAM Banking Demo.
+#
+#   docker compose --profile infra up -d   → shared infrastructure only (run services from your IDE)
+#   docker compose --profile all up -d     → infrastructure + every service (added in later phases)
+#
+# All ports and credentials come from .env (copy .env.example).
+
+name: ciam-banking-demo
+
+x-infra: &infra
+  profiles: ["infra", "all"]
+  restart: unless-stopped
+
+services:
+
+  postgres:
+    <<: *infra
+    image: postgres:17.11
+    environment:
+      POSTGRES_USER: ${POSTGRES_SUPERUSER}
+      POSTGRES_PASSWORD: ${POSTGRES_SUPERUSER_PASSWORD}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD}
+    ports: ["${POSTGRES_PORT}:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./infra/postgres/init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_SUPERUSER}"]
+      interval: 5s
+      retries: 20
+
+  keycloak:
+    <<: *infra
+    image: quay.io/keycloak/keycloak:26.7.4
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak_db
+      KC_DB_USERNAME: keycloak_user
+      KC_DB_PASSWORD: ${APP_DB_PASSWORD}
+      # Keycloak listens on the same port inside and outside the container, and the public
+      # hostname is fixed. So tokens always carry iss=http://localhost:8180/realms/bank, whether
+      # a browser or a container fetched them.
+      KC_HTTP_PORT: ${KEYCLOAK_PORT}
+      KC_HOSTNAME: http://localhost:${KEYCLOAK_PORT}
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
+      KC_HEALTH_ENABLED: "true"
+      # Substituted into realm-bank.json at import time
+      CUSTOMER_SVC_CLIENT_SECRET: ${CUSTOMER_SVC_CLIENT_SECRET}
+      TEST_USER_PASSWORD: ${TEST_USER_PASSWORD}
+    ports: ["${KEYCLOAK_PORT}:${KEYCLOAK_PORT}"]
+    volumes:
+      - ./infra/keycloak:/opt/keycloak/data/import:ro
+    depends_on:
+      postgres: { condition: service_healthy }
+    healthcheck:
+      # The image has no curl, so talk HTTP to the management port over bash's /dev/tcp.
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && grep -q UP <&3"]
+      interval: 10s
+      retries: 30
+      start_period: 20s
+
+  kafka:
+    <<: *infra
+    image: apache/kafka:4.3.1
+    environment:
+      # Single node acting as both broker and KRaft controller (no ZooKeeper since Kafka 4).
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      # INTERNAL: containers use kafka:29092.  EXTERNAL: your IDE uses localhost:9092.
+      KAFKA_LISTENERS: INTERNAL://:29092,EXTERNAL://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://localhost:${KAFKA_HOST_PORT}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    # No volume: topics are recreated by kafka-init, and dev data is disposable.
+    ports: ["${KAFKA_HOST_PORT}:9092"]
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server kafka:29092 >/dev/null 2>&1"]
+      interval: 10s
+      retries: 20
+      start_period: 15s
+
+  kafka-init:
+    profiles: ["infra", "all"]
+    image: apache/kafka:4.3.1
+    entrypoint: ["bash", "/scripts/create-topics.sh"]
+    environment:
+      KAFKA_BOOTSTRAP: kafka:29092
+    volumes:
+      - ./infra/kafka/create-topics.sh:/scripts/create-topics.sh:ro
+    depends_on:
+      kafka: { condition: service_healthy }
+    restart: "no"
+
+  rabbitmq:
+    <<: *infra
+    image: rabbitmq:4.3.6-management
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      - "${RABBITMQ_PORT}:5672"
+      - "${RABBITMQ_UI_PORT}:15672"
+    volumes:
+      - rabbitdata:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      retries: 20
+
+  mailpit:
+    <<: *infra
+    image: axllent/mailpit:v1.31.2
+    ports:
+      - "${MAILPIT_SMTP_PORT}:1025"
+      - "${MAILPIT_UI_PORT}:8025"
+
+  jaeger:
+    <<: *infra
+    image: jaegertracing/jaeger:2.21.0
+    ports:
+      - "${JAEGER_UI_PORT}:16686"
+      - "${OTLP_GRPC_PORT}:4317"
+      - "${OTLP_HTTP_PORT}:4318"
+
+volumes:
+  pgdata:
+  rabbitdata:

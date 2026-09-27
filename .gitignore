@@ -1,0 +1,28 @@
+# Local secrets
+.env
+
+# Java / Maven
+target/
+*.class
+.mvn/wrapper/maven-wrapper.jar
+
+# .NET
+bin/
+obj/
+*.user
+TestResults/
+
+# Node / frontends
+node_modules/
+dist/
+.angular/
+coverage/
+playwright-report/
+test-results/
+
+# IDEs / OS
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
