@@ -11,6 +11,8 @@ A small online-banking platform showing customer identity (CIAM), microservices 
 
 The architecture diagrams, request flows and design decisions are in [`docs/blueprint.html`](docs/blueprint.html). Open it in a browser.
 
+Local URLs and logins: [`docs/LOCAL-CREDENTIALS.md`](docs/LOCAL-CREDENTIALS.md). Remaining work: [`docs/ROADMAP.md`](docs/ROADMAP.md).
+
 ## Status
 
 | Phase | Scope | State |
