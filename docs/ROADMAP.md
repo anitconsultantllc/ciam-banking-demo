@@ -3,7 +3,7 @@
 The build plan from `docs/blueprint.html`, broken into tasks. Tick a box when a task is done and committed. Each phase ends with a walkthrough in `docs/walkthroughs/` and a hands-on check by Whaylon before the next phase starts.
 
 ## Open decisions
-- [ ] **GitHub account for the repo:** `gh` is signed in as `anitconsultantllc`, while commits use `colemanwhaylon`. Pick the owner and public/private, then push and confirm CI goes green.
+- [x] GitHub repo: public at https://github.com/anitconsultantllc/ciam-banking-demo. First CI run is green.
 
 ## Phase 1: Foundation ✅
 - [x] Parent POM (Java 25, Spring Boot 4.0.8, Spring Cloud 2025.1.3) + Maven wrapper 3.9.16
@@ -11,7 +11,7 @@ The build plan from `docs/blueprint.html`, broken into tasks. Tick a box when a 
 - [x] Keycloak realm as code: roles, PKCE clients, admin service account, brute force, step-up flow, test users
 - [x] Kafka topics script (auto-create disabled)
 - [x] CI workflow skeleton, ADRs 0001–0004, Phase 1 walkthrough
-- [ ] Push to GitHub (blocked on the open decision above)
+- [x] Push to GitHub
 
 ## Phase 2: Customer + Account services
 - [ ] `libs/java-platform`: event envelope, transactional outbox + relay, processed-events (idempotent consumer), Keycloak role converter, problem+json handler
